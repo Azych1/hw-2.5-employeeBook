@@ -6,42 +6,46 @@ import skypro.hw2.employeeBook.exception.EmployeeAlreadyAddedException;
 import skypro.hw2.employeeBook.exception.EmployeeNotFoundException;
 import skypro.hw2.employeeBook.exception.EmployeeStorageIsFullException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private List<Employee> employees;
+    private Map<String, Employee> employeeMap;
 
     private static final int EMPLOYEE_SIZE = 3;
 
     public EmployeeServiceImpl() {
-        this.employees = new ArrayList<>();
+
+        this.employeeMap = new HashMap<>();
     }
 
     @Override
     public Employee addEmployee(String firstName, String lastName) {
-        if (employees.size() == EMPLOYEE_SIZE) {
+        if (employeeMap.size() == EMPLOYEE_SIZE) {
             throw new EmployeeStorageIsFullException();
         }
 
         Employee employee = new Employee(firstName, lastName);
+        String key = generateKey(firstName, lastName);
 
-        if (employees.contains(employee)) {
+        if (employeeMap.containsKey(key)) {
             throw new EmployeeAlreadyAddedException();
         }
 
-        employees.add(employee);
+        employeeMap.put(key, employee);
 
         return employee;
     }
 
     @Override
-    public Employee remoteEmployee(String firstName, String lastName) {
-        Employee employee = new Employee(firstName, lastName);
-        if (!employees.remove(employee)) {
+    public Employee removeEmployee(String firstName, String lastName) {
+
+        String key = generateKey(firstName, lastName);
+
+        Employee employee = employeeMap.remove(key);
+
+        if (employee == null) {
             throw new EmployeeNotFoundException();
         }
 
@@ -50,8 +54,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee getEmployee(String firstName, String lastName) {
-        Employee employee = new Employee(firstName, lastName);
-        if (!employees.contains(employee)) {
+        String key = generateKey(firstName, lastName);
+
+        Employee employee = employeeMap.get(key);
+
+        if (employee == null) {
             throw new EmployeeNotFoundException();
         }
 
@@ -60,7 +67,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Collection<Employee> findAll() {
-        return employees;
+        return employeeMap.values();
+    }
+
+    private String generateKey(String firstName, String lastName) {
+        return firstName + lastName;
     }
 
 }
