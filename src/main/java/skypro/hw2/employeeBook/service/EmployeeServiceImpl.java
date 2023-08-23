@@ -21,12 +21,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee addEmployee(String firstName, String lastName) {
+    public Employee addEmployee(String firstName, String lastName, int department, double salary) {
         if (employeeMap.size() == EMPLOYEE_SIZE) {
             throw new EmployeeStorageIsFullException();
         }
 
-        Employee employee = new Employee(firstName, lastName);
+        Employee employee = new Employee(firstName, lastName, department, salary);
         String key = generateKey(firstName, lastName);
 
         if (employeeMap.containsKey(key)) {
